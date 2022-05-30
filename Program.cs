@@ -105,16 +105,16 @@ namespace NBomberTest
             {
                 var response = await context.Client.GetAsync(baseUserUrl + "/" + userId);
                 return response.IsSuccessStatusCode
-                    ? Response.Ok()
-                    : Response.Fail();
+                ? Response.Ok(statusCode: (int)response.StatusCode)
+                : Response.Fail(statusCode: (int)response.StatusCode);
             });
            var loadUserTweets = Step.Create("GetTweetsByUserId", clientFactory: httpFactory,
             execute: async context =>
             {
                 var response = await context.Client.GetAsync(baseTweetUrl + "/" + userId);
                 return response.IsSuccessStatusCode
-                    ? Response.Ok()
-                    : Response.Fail();
+                ? Response.Ok(statusCode: (int)response.StatusCode)
+                : Response.Fail(statusCode: (int)response.StatusCode);
             });
 
             var loadUserFollowers = Step.Create("GetFollowersByUserId", clientFactory: httpFactory,
@@ -122,8 +122,8 @@ namespace NBomberTest
              {
                  var response = await context.Client.GetAsync(baseUserUrl + "/followers/" + userId);
                  return response.IsSuccessStatusCode
-                     ? Response.Ok()
-                     : Response.Fail();
+                ? Response.Ok(statusCode: (int)response.StatusCode)
+                : Response.Fail(statusCode: (int)response.StatusCode);
              });
 
             var loadUserFollowings = Step.Create("GetFollowingsByUserId", clientFactory: httpFactory,
@@ -131,13 +131,13 @@ namespace NBomberTest
              {
                  var response = await context.Client.GetAsync(baseUserUrl + "/followings/" + userId);
                  return response.IsSuccessStatusCode
-                     ? Response.Ok()
-                     : Response.Fail();
+                ? Response.Ok(statusCode: (int)response.StatusCode)
+                : Response.Fail(statusCode: (int)response.StatusCode);
              });
 
             var scenario = ScenarioBuilder
                 .CreateScenario("Simulate user page requests", loadUserData, loadUserTweets, loadUserFollowers, loadUserFollowings)
-                .WithWarmUpDuration(TimeSpan.FromSeconds(5))
+                .WithWarmUpDuration(TimeSpan.FromSeconds(20))
                 .WithLoadSimulations(new[]
                 {
                     // from the nBomber docs:
@@ -147,11 +147,11 @@ namespace NBomberTest
                     // Every single scenario copy will run only once.
                     // Use it when you want to maintain a random rate of requests
                     // without being affected by the performance of the system under test.
-                    Simulation.InjectPerSecRandom(minRate: 5, maxRate: 10, during: TimeSpan.FromMinutes(1))
+                    Simulation.InjectPerSecRandom(minRate: 80, maxRate: 130, during: TimeSpan.FromMinutes(10))
                 });
 
 
-            NBomberRunner.RegisterScenarios(scenario).WithReportFolder("TweetsPostTest")
+            NBomberRunner.RegisterScenarios(scenario).WithReportFolder("UserFlowPerformanceLong")
                    .WithReportFormats(ReportFormat.Txt, ReportFormat.Csv, ReportFormat.Html, ReportFormat.Md).Run();
         }
     }
