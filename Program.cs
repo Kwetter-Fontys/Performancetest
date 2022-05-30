@@ -22,7 +22,7 @@ namespace NBomberTest
         {
             //BasicStressTestUserService
             //StressTestPostTweet();
-            SimulateMultipleUsersGoingToTheStartPage
+            SimulateMultipleUsersGoingToTheStartPage();
         }
 
         public static string GetAccessToken()
@@ -100,7 +100,7 @@ namespace NBomberTest
                     return Task.FromResult(client);
                 });
 
-            var loadUserData = Step.Create("GetUserByUserId", clientFactory: HttpClientFactory.Create(),
+            var loadUserData = Step.Create("GetUserByUserId", clientFactory: httpFactory,
             execute: async context =>
             {
                 var response = await context.Client.GetAsync(baseUserUrl + "/" + userId);
@@ -108,7 +108,7 @@ namespace NBomberTest
                     ? Response.Ok()
                     : Response.Fail();
             });
-           var loadUserTweets = Step.Create("GetTweetsByUserId", clientFactory: HttpClientFactory.Create(),
+           var loadUserTweets = Step.Create("GetTweetsByUserId", clientFactory: httpFactory,
             execute: async context =>
             {
                 var response = await context.Client.GetAsync(baseTweetUrl + "/" + userId);
@@ -117,7 +117,7 @@ namespace NBomberTest
                     : Response.Fail();
             });
 
-            var loadUserFollowers = Step.Create("GetFollowersByUserId", clientFactory: HttpClientFactory.Create(),
+            var loadUserFollowers = Step.Create("GetFollowersByUserId", clientFactory: httpFactory,
              execute: async context =>
              {
                  var response = await context.Client.GetAsync(baseUserUrl + "/followers/" + userId);
@@ -126,7 +126,7 @@ namespace NBomberTest
                      : Response.Fail();
              });
 
-            var loadUserFollowings = Step.Create("GetFollowingsByUserId", clientFactory: HttpClientFactory.Create(),
+            var loadUserFollowings = Step.Create("GetFollowingsByUserId", clientFactory: httpFactory,
              execute: async context =>
              {
                  var response = await context.Client.GetAsync(baseUserUrl + "/followings/" + userId);
