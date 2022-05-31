@@ -15,14 +15,14 @@ namespace NBomberTest
     class Program
     {
         static string baseUserUrl = "https://user-service.sebananasprod.nl/api/usercontroller";
-        static string baseTweetUrl = "https://user-service.sebananasprod.nl/api/usercontroller";
+        static string baseTweetUrl = "https://tweet-service.sebananasprod.nl/api/tweetcontroller";
         static string baseKeycloakUrl = "https://keycloak.sebananasprod.nl/auth/realms/kwetter/protocol/openid-connect/token";
         static string userId = "bf40cabc-3cc7-49bb-aeba-cd1c6ab23dcc";
         static void Main(string[] args)
         {
             //BasicStressTestUserService
-            //StressTestPostTweet();
-            SimulateMultipleUsersGoingToTheStartPage();
+            StressTestPostTweet();
+            //SimulateMultipleUsersGoingToTheStartPage();
         }
 
         public static string GetAccessToken()
@@ -137,7 +137,7 @@ namespace NBomberTest
 
             var scenario = ScenarioBuilder
                 .CreateScenario("Simulate user page requests", loadUserData, loadUserTweets, loadUserFollowers, loadUserFollowings)
-                .WithWarmUpDuration(TimeSpan.FromSeconds(20))
+                .WithWarmUpDuration(TimeSpan.FromSeconds(10))
                 .WithLoadSimulations(new[]
                 {
                     // from the nBomber docs:
@@ -147,7 +147,7 @@ namespace NBomberTest
                     // Every single scenario copy will run only once.
                     // Use it when you want to maintain a random rate of requests
                     // without being affected by the performance of the system under test.
-                    Simulation.InjectPerSecRandom(minRate: 80, maxRate: 130, during: TimeSpan.FromMinutes(10))
+                    Simulation.InjectPerSecRandom(minRate: 80, maxRate: 130, during: TimeSpan.FromMinutes(1))
                 });
 
 
