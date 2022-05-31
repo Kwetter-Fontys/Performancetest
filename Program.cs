@@ -21,9 +21,9 @@ namespace NBomberTest
         static void Main(string[] args)
         {
 
-            BasicStressTestUserService();
-            //BasicStressTestTweetService();
+            //BasicStressTestUserService();
             //StressTestPostTweet();
+            BasicStressTestTweetService();
             //SimulateMultipleUsersGoingToTheStartPage();
         }
 
@@ -75,7 +75,7 @@ namespace NBomberTest
 
 
             var scenario = ScenarioBuilder
-                .CreateScenario("simple get users", step)
+                .CreateScenario("simple get tweets", step)
                 .WithWarmUpDuration(TimeSpan.FromSeconds(5))
                 .WithLoadSimulations(Simulation.InjectPerSec(rate: 100, during: TimeSpan.FromSeconds(30)));
 
