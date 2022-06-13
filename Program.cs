@@ -21,9 +21,10 @@ namespace NBomberTest
         static void Main(string[] args)
         {
 
-            //BasicStressTestUserService();
+
+            BasicStressTestUserService();
             //StressTestPostTweet();
-            BasicStressTestTweetService();
+            //BasicStressTestTweetService();
             //SimulateMultipleUsersGoingToTheStartPage();
         }
 
@@ -44,19 +45,36 @@ namespace NBomberTest
 
         public static void BasicStressTestUserService()
         {
-            string Accesstoken = GetAccessToken();
-            var step = Step.Create("simple get users", clientFactory: HttpClientFactory.Create(),
-            execute: context =>
+            var httpFactory = ClientFactory.Create(
+            name: "http_factory",
+            clientCount: 1,
+            // we need to init our client with our API token
+            initClient: (number, context) =>
             {
-                var request = Http.CreateRequest("GET", baseUserUrl).WithHeader("Authorization", "Bearer " + Accesstoken);
-                return Http.Send(request, context);
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue(
+                "Bearer",
+                GetAccessToken());
+                return Task.FromResult(client);
             });
+
+            //string Accesstoken = GetAccessToken();
+            var step = Step.Create("simple get users", clientFactory: httpFactory,
+            execute: async context =>
+            {
+                var response = await context.Client.GetAsync(baseUserUrl);
+                return response.IsSuccessStatusCode
+                ? Response.Ok(statusCode: (int)response.StatusCode)
+                : Response.Fail(statusCode: (int)response.StatusCode);
+            });
+
 
 
             var scenario = ScenarioBuilder
                 .CreateScenario("simple get users", step)
-                .WithWarmUpDuration(TimeSpan.FromSeconds(5))
-                .WithLoadSimulations(Simulation.InjectPerSec(rate: 100, during: TimeSpan.FromSeconds(30)));
+                .WithWarmUpDuration(TimeSpan.FromSeconds(10))
+                .WithLoadSimulations(Simulation.InjectPerSec(rate: 500, during: TimeSpan.FromSeconds(60)));
 
 
             NBomberRunner.RegisterScenarios(scenario).Run();
@@ -77,7 +95,7 @@ namespace NBomberTest
             var scenario = ScenarioBuilder
                 .CreateScenario("simple get tweets", step)
                 .WithWarmUpDuration(TimeSpan.FromSeconds(5))
-                .WithLoadSimulations(Simulation.InjectPerSec(rate: 100, during: TimeSpan.FromSeconds(30)));
+                .WithLoadSimulations(Simulation.InjectPerSec(rate: 100, during: TimeSpan.FromSeconds(60)));
 
 
             NBomberRunner.RegisterScenarios(scenario).Run();
@@ -169,7 +187,7 @@ namespace NBomberTest
                     // Every single scenario copy will run only once.
                     // Use it when you want to maintain a random rate of requests
                     // without being affected by the performance of the system under test.
-                    Simulation.InjectPerSecRandom(minRate: 20, maxRate: 50, during: TimeSpan.FromMinutes(30))
+                    Simulation.InjectPerSecRandom(minRate: 200, maxRate: 200, during: TimeSpan.FromMinutes(30))
                 });
 
 
